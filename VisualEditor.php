@@ -947,7 +947,7 @@ $wgResourceModules += array(
 			'modules/ve-mw/ui/tools/ve.ui.MWReferenceDialogTool.js',
 			'modules/ve-mw/ui/tools/ve.ui.MWCitationDialogTool.js',
 
-			//TODO: patched by vedmaka
+			//TODO: patched by vedmaka, hacked
 			'modules/ve-mw/ui/widgets/ve.ui.MWFileSearchWidget.js',
 			'modules/ve-mw/ui/widgets/ve.ui.MWFileResultWidget.js',
 
@@ -961,7 +961,7 @@ $wgResourceModules += array(
 			'modules/ve-mw/ui/styles/ve.ui.MWReferenceResultWidget.css',
 			'modules/ve-mw/ui/styles/ve.ui.MWReferenceSearchWidget.css',
 
-			//TODO: patched by vedmaka
+			//TODO: patched by vedmaka, hacked
 			'modules/ve-mw/ui/styles/ve.ui.MWFileSearchWidget.css',
 
 		),

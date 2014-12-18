@@ -68,7 +68,7 @@ ve.ui.commandRegistry.register(
 	new ve.ui.Command( 'preformatted', 'format', 'convert', 'mwPreformatted' )
 );
 
-//TODO: patched by vedmaka
+//TODO: patched by vedmaka, hacked
 ve.ui.commandRegistry.register(
 	new ve.ui.Command( 'chartInsert', 'dialog', 'open', 'chartInsert' )
 );

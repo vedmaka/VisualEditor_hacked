@@ -25,4 +25,3 @@ Neil Kandalgaonkar <neilk@brevity.org>
 Mark A. Hershberger <mah@everybody.org>
 Mark Holmquist <mtraceur@member.fsf.org>
 Subramanya Sastry <ssastry@wikimedia.org>
-a
