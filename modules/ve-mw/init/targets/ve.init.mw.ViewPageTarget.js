@@ -70,6 +70,7 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 	this.modules.push(
 		'ext.visualEditor.mwformatting',
 		'ext.visualEditor.mwgallery',
+		'ext.visualEditor.mwcharts',
 		'ext.visualEditor.mwimage',
 		'ext.visualEditor.mwmeta',
 		'ext.visualEditor.mwreference',

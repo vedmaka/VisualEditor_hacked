@@ -257,6 +257,8 @@ $wgResourceModules += array(
 			'modules/ve-mw/init/ve.init.mw.Platform.js',
 			'modules/ve-mw/init/ve.init.mw.Target.js',
 			'modules/ve-mw/init/ve.init.mw.TargetEvents.js',
+			//todo: hack
+			'lib/ve/lib/papaparse/papaparse.js',
 		),
 		'dependencies' => array(
 			'jquery.visibleText',
@@ -947,22 +949,12 @@ $wgResourceModules += array(
 			'modules/ve-mw/ui/tools/ve.ui.MWReferenceDialogTool.js',
 			'modules/ve-mw/ui/tools/ve.ui.MWCitationDialogTool.js',
 
-			//TODO: patched by vedmaka, hacked
-			'modules/ve-mw/ui/widgets/ve.ui.MWFileSearchWidget.js',
-			'modules/ve-mw/ui/widgets/ve.ui.MWFileResultWidget.js',
-
-			'modules/ve-mw/ui/dialogs/ve.ui.MWChartInsertDialog.js',
-			'modules/ve-mw/ui/tools/ve.ui.MWChartDialogTool.js',
-
 		),
 		'styles' => array(
 			'modules/ve-mw/ce/styles/ve.ce.MWReferenceListNode.css',
 			'modules/ve-mw/ce/styles/ve.ce.MWReferenceNode.css',
 			'modules/ve-mw/ui/styles/ve.ui.MWReferenceResultWidget.css',
 			'modules/ve-mw/ui/styles/ve.ui.MWReferenceSearchWidget.css',
-
-			//TODO: patched by vedmaka, hacked
-			'modules/ve-mw/ui/styles/ve.ui.MWFileSearchWidget.css',
 
 		),
 		'dependencies' => array(
@@ -1141,6 +1133,39 @@ $wgResourceModules += array(
 		),
 		'targets' => array( 'desktop', 'mobile' ),
 	),
+
+	'ext.visualEditor.mwcharts' => $wgVisualEditorResourceTemplate + array(
+			'scripts' => array(
+
+				'modules/ve-mw/dm/models/ve.dm.MWGraphModel.js',
+
+				'modules/ve-mw/dm/nodes/ve.dm.MWGraphNode.js',
+				'modules/ve-mw/ce/nodes/ve.ce.MWGraphNode.js',
+
+				//'modules/ve-mw/dm/metaitems/ve.dm.MWGraphMetaItem.js',
+
+				'modules/ve-mw/ui/widgets/ve.ui.MWFileSearchWidget.js',
+				'modules/ve-mw/ui/widgets/ve.ui.MWFileResultWidget.js',
+
+				'modules/ve-mw/ui/dialogs/ve.ui.MWChartInsertDialog.js',
+
+				'modules/ve-mw/ui/tools/ve.ui.MWChartDialogTool.js',
+
+				'modules/ve-mw/ui/inspectors/ve.ui.MWChartInspector.js',
+
+			),
+			'styles' => array(
+				'modules/ve-mw/ui/styles/ve.ui.MWFileSearchWidget.css',
+			),
+			'dependencies' => array(
+				'ext.visualEditor.mwcore',
+			),
+			'messages' => array(
+				'visualeditor-mwgalleryinspector-placeholder',
+				'visualeditor-mwgalleryinspector-title',
+			),
+			'targets' => array( 'desktop', 'mobile' ),
+		),
 
 	'ext.visualEditor.mwhiero' => $wgVisualEditorResourceTemplate + array(
 		'scripts' => array(

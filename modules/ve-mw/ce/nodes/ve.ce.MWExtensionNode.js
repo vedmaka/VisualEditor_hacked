@@ -56,12 +56,17 @@ OO.mixinClass( ve.ce.MWExtensionNode, ve.ce.ClickableNode );
 /** */
 ve.ce.MWExtensionNode.prototype.generateContents = function ( config ) {
 	var xhr,
-		deferred = $.Deferred(),
-		mwData = this.getModel().getAttribute( 'mw' ),
-		extsrc = config && config.extsrc !== undefined ? config.extsrc : mwData.body.extsrc,
-		attrs = config && config.attrs || mwData.attrs,
-		xmlDoc = ( new DOMParser() ).parseFromString( '<' + this.getModel().getExtensionName() + '/>', 'text/xml' ),
-		wikitext = ( new XMLSerializer() ).serializeToString(
+		deferred = $.Deferred();
+
+	var mwData = this.getModel().getAttribute( 'mw' );
+
+	var extsrc = config && config.extsrc !== undefined ? config.extsrc : mwData.body.extsrc;
+
+	var attrs = config && config.attrs || mwData.attrs;
+
+	var xmlDoc = ( new DOMParser() ).parseFromString( '<' + this.getModel().getExtensionName() + '/>', 'text/xml' );
+
+	var wikitext = ( new XMLSerializer() ).serializeToString(
 			$( xmlDoc.documentElement ).attr( attrs ).text( extsrc )[0]
 		);
 

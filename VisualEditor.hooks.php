@@ -41,6 +41,8 @@ class VisualEditorHooks {
 	public static function onBeforePageDisplay( &$output, &$skin ) {
 		$output->addModules( array( 'ext.visualEditor.viewPageTarget.init' ) );
 		$output->addModuleStyles( array( 'ext.visualEditor.viewPageTarget.noscript' ) );
+		//todo: hacked
+		$output->addHeadItem('googlecharts',"<script type='text/javascript' src='https://www.google.com/jsapi?autoload={\"modules\":[{\"name\":\"visualization\",\"version\":\"1\",\"packages\":[\"corechart\",\"table\"]}]}'></script>");
 		return true;
 	}
 
@@ -623,6 +625,7 @@ class VisualEditorHooks {
 				'ext.visualEditor.mwformatting',
 				'ext.visualEditor.mwlink',
 				'ext.visualEditor.mwgallery',
+				'ext.visualEditor.mwcharts',
 				'ext.visualEditor.mwimage',
 				'ext.visualEditor.mwmeta',
 				'ext.visualEditor.mwreference',

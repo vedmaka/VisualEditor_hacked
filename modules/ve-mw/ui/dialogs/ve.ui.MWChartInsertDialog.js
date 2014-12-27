@@ -27,6 +27,11 @@ ve.ui.MWChartInsertDialog = function VeUiMWChartInsertDialog( config ) {
 	this.item = null;
 	this.referenceModel = null;
 	this.sources = {};
+	this.graphData = null;
+	this.transclusion = null;
+	this.transclusionNode = null;
+	this.inserting = true;
+	this.csvFile = null;
 };
 
 /* Inheritance */
@@ -69,7 +74,71 @@ ve.ui.MWChartInsertDialog.prototype.onSearchSelect = function ( item ) {
 		 * 3. Feed Graph with content and display it
 		 */
 
+		var self = this;
+
+		//Store file name into variable
+		this.csvFile = item.title;
+		this.transclusion.csvFile = this.csvFile;
+
+		var fileUrl = item.imageinfo[0].url;
+		var fileContent = '';
+		$.get(fileUrl, function(data){
+			fileContent = data;console.log(fileContent);
+
+			var csvData = Papa.parse(fileContent, {
+				header: true
+			});
+
+			var dataArr = [
+				csvData.meta.fields
+			];
+
+			$(csvData.data).each(function(i,v){
+				var itemArr = [];
+				$(csvData.meta.fields).each(function(i2,v2){
+					var arValue = v[v2];
+					if( /^\+?(0|[1-9]\d*)$/.test(arValue) ) {
+						arValue = parseInt(arValue);
+					}
+					itemArr.push(arValue);
+				});
+				dataArr.push(itemArr);
+			});
+
+			self.$spinner.hide();
+			self.drawChart(dataArr, {
+				title: 'Sample graph',
+				hAxis: {title: csvData.meta.fields[0]}
+			});
+
+			self.applyButton.setDisabled(false);
+
+			//StoreData
+			self.graphData = dataArr;
+
+		});
+
+
 	}
+};
+
+ve.ui.MWChartInsertDialog.prototype.drawChart = function(dataArr, options) {
+
+	var data = google.visualization.arrayToDataTable(dataArr);
+
+	if( !options ) {
+		options = {
+			title: 'Sample graph',
+			hAxis: {title: 'Year', titleTextStyle: {color: 'red'}}
+		};
+	}
+
+	var chart = new google.visualization.ColumnChart( this.chartDiv.get(0) );
+
+	$(this.chartDiv).show();
+
+	chart.draw(data, options);
+
 };
 
 /**
@@ -92,7 +161,7 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 	//Buttons
 	this.applyButton = new OO.ui.ButtonWidget( {
 		'$': this.$,
-		'label': 'Save graph',
+		'label': 'Insert graph',
 		'flags': ['primary']
 	} );
 
@@ -101,18 +170,26 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 		'$': this.$
 	} );
 
+	//ChartDiv
+	this.chartDiv = $('<div/>');
+	$(this.chartDiv).addClass('we-ui-MWChartInsertDialog-chart');
+	$(this.chartDiv).attr('id','g_chart_div');
+	$(this.chartDiv).hide();
+
 	// Initialization
 	this.search.$element.addClass( 've-ui-MWChartInsertDialog-select' );
 
 	// Events
 	this.search.connect( this, { 'select': 'onSearchSelect' } );
 	this.applyButton.connect( this, { 'click': [ 'close', { 'action': 'insert' } ] } );
+	this.applyButton.setDisabled(true);
 
 	//Set spinner
 	this.$spinner = this.$( '<div>' ).addClass( 've-specialchar-spinner' );
 
 	//Append to layout
 	this.$body.append( this.$spinner );
+	this.$body.append( this.chartDiv );
 	this.$body.append( this.search.$element );
 	this.$body.append( this.helpText.$element );
 	this.$foot.append( this.applyButton.$element );
@@ -120,11 +197,28 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 };
 
 /**
+ * Get the transclusion node to be edited.
+ *
+ * @returns {ve.dm.MWTransclusionNode|null} Transclusion node to be edited, null if none exists
+ */
+ve.ui.MWChartInsertDialog.prototype.getTransclusionNode = function () {
+	var focusedNode = this.getFragment().getSelectedNode();
+	return focusedNode instanceof ve.dm.MWGraphNode ? focusedNode : null;
+};
+
+/**
  * @inheritdoc
  */
 ve.ui.MWChartInsertDialog.prototype.setup = function ( data ) {
+
+	var transclusionNode = this.getTransclusionNode();
+
 	// Parent method
 	ve.ui.Dialog.prototype.setup.call( this, data );
+
+	this.transclusion = new ve.dm.MWGraphModel();
+	this.transclusionNode = transclusionNode instanceof ve.dm.MWGraphNode ? transclusionNode : null;
+	this.inserting = !this.transclusionNode;
 
 	// Show a spinner while we check for file repos.
 	// this will only be done once per session.
@@ -196,10 +290,23 @@ ve.ui.MWChartInsertDialog.prototype.getFileRepos = function () {
 };
 
 /**
+ * Save changes.
+ */
+ve.ui.MWChartInsertDialog.prototype.saveChanges = function () {
+	var surfaceModel = this.getFragment().getSurface();
+
+	if ( this.transclusionNode instanceof ve.dm.MWGraphNode ) {
+		this.transclusion.updateTransclusionNode( surfaceModel, this.transclusionNode );
+	} else {
+		this.transclusion.insertTransclusionNode( surfaceModel );
+	}
+};
+
+/**
  * @inheritdoc
  */
 ve.ui.MWChartInsertDialog.prototype.teardown = function ( data ) {
-	var info, newDimensions, scalable;
+
 	// Data initialization
 	data = data || {};
 
@@ -214,55 +321,12 @@ ve.ui.MWChartInsertDialog.prototype.teardown = function ( data ) {
 		 * TODO: inspector actions
 		 */
 
-		info = this.item.imageinfo[0];
-		// Create a scalable for calculations
-		scalable = new ve.dm.Scalable( {
-			'originalDimensions': {
-				'width': info.width,
-				'height': info.height
-			}
-		} );
-		// Resize to default thumbnail size, but only if the image itself
-		// isn't smaller than the default size
-		if ( info.width > this.defaultThumbSize ) {
-			newDimensions = scalable.getDimensionsFromValue( {
-				'width': this.defaultThumbSize
-			} );
-		} else {
-			newDimensions = {
-				'width': info.width,
-				'height': info.height
-			};
-		}
-
-		/*this.getFragment().collapseRangeToEnd().insertContent(
-			[
-			{
-				'type': 'mwBlockImage',
-				'attributes': {
-					'type': 'thumb',
-					'align': 'default',
-					// Per https://www.mediawiki.org/w/?diff=931265&oldid=prev
-					'href': './' + this.item.title,
-					'src': info.thumburl,
-					'width': newDimensions.width,
-					'height': newDimensions.height,
-					'resource': './' + this.item.title,
-					'defaultSize': true
-				}
-			},
-			{ 'type': 'mwImageCaption' },
-			{ 'type': '/mwImageCaption' },
-			{ 'type': '/mwBlockImage' }
-		] ).collapseRangeToEnd().select();*/
-
-		this.getFragment().collapseRangeToEnd();
-		this.referenceModel = new ve.dm.MWAlienExtensionNode();
-
+		this.saveChanges();
 
 	}
 
 	this.search.clear();
+	this.transclusion.disconnect( this );
 
 	// Parent method
 	ve.ui.Dialog.prototype.teardown.call( this, data );
