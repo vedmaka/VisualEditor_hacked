@@ -27,6 +27,9 @@
 		this.uid = 0;
 		this.dataArr = [];
 		this.csvFile = '';
+		this.chartTitle = 'Sample chart';
+		this.chartType = 'bar';
+		this.chartHeight = 400;
 
 	};
 
@@ -69,7 +72,9 @@
 								'extsrc': this.csvFile
 							},
 							'attrs': {
-
+								'type': this.chartType,
+								'title': this.chartTitle,
+								'height': this.chartHeight
 							},
 							'name': 'chartInsert'
 						}

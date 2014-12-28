@@ -17,12 +17,20 @@
 ve.ui.MWGalleryInspectorTool = function VeUiMWGalleryInspectorTool( toolGroup, config ) {
 	ve.ui.InspectorTool.call( this, toolGroup, config );
 };
+
 OO.inheritClass( ve.ui.MWGalleryInspectorTool, ve.ui.InspectorTool );
+
 ve.ui.MWGalleryInspectorTool.static.name = 'gallery';
+
 ve.ui.MWGalleryInspectorTool.static.group = 'object';
+
 ve.ui.MWGalleryInspectorTool.static.icon = 'gallery';
+
 ve.ui.MWGalleryInspectorTool.static.title =
 	OO.ui.deferMsg( 'visualeditor-mwgalleryinspector-title' );
+
 ve.ui.MWGalleryInspectorTool.static.modelClasses = [ ve.dm.MWGalleryNode ];
+
 ve.ui.MWGalleryInspectorTool.static.commandName = 'gallery';
+
 ve.ui.toolFactory.register( ve.ui.MWGalleryInspectorTool );

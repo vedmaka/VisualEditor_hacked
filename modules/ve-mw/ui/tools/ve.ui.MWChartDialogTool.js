@@ -36,6 +36,6 @@ ve.ui.MWChartInsertDialogTool.static.commandName = 'chartInsert';
 
 ve.ui.MWChartInsertDialogTool.static.template = null;
 
-ve.ui.MWChartInsertDialogTool.static.modelClasses = [ ve.dm.MWReferenceNode ];
+ve.ui.MWChartInsertDialogTool.static.modelClasses = [ ve.dm.MWGraphNode ];
 
 ve.ui.toolFactory.register( ve.ui.MWChartInsertDialogTool );

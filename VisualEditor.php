@@ -1151,7 +1151,7 @@ $wgResourceModules += array(
 
 				'modules/ve-mw/ui/tools/ve.ui.MWChartDialogTool.js',
 
-				'modules/ve-mw/ui/inspectors/ve.ui.MWChartInspector.js',
+				//'modules/ve-mw/ui/inspectors/ve.ui.MWChartInspector.js',
 
 			),
 			'styles' => array(
