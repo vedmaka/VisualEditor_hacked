@@ -90,17 +90,42 @@ ve.ui.MWFileSearchWidget.prototype.onResultsScroll = function () {
 	}
 };
 
+ve.ui.MWFileSearchWidget.prototype.queryMediaSources = function() {
+
+	ve.init.mw.Target.static.apiRequest({
+			'action': 'opensearch',
+			'search': this.query.getValue(),
+			'namespace': 6,
+			'suggest': ''
+	}).done( ve.bind( this.queryMediaSources2, this ) );
+
+};
+
 /**
  * Query all sources for media.
  *
  * @method
  */
-ve.ui.MWFileSearchWidget.prototype.queryMediaSources = function () {
+ve.ui.MWFileSearchWidget.prototype.queryMediaSources2 = function (titles) {
 	var i, len, source, url,
 		value = this.query.getValue();
 
 	if ( value === '' ) {
 		return;
+	}
+
+	var nTitles = [];
+
+	if( titles == undefined ) {
+		titles = '';
+	}else{
+		$(titles[1]).each(function(i,v){
+			if( v.indexOf('.csv') != -1 || v.indexOf('.txt') != -1 ) {
+				nTitles.push(v);
+			}
+		});
+		titles[1] = [];
+		titles[1] = nTitles;
 	}
 
 	for ( i = 0, len = this.sources.length; i < len; i++ ) {
@@ -121,8 +146,33 @@ ve.ui.MWFileSearchWidget.prototype.queryMediaSources = function () {
 				// from scriptDirUrl and /api.php suffix
 				url = source.apiurl || ( source.scriptDirUrl + '/api.php' );
 			}
+
 			this.query.pushPending();
+
 			source.request = ve.init.mw.Target.static.apiRequest( {
+			 'action': 'query',
+			 'namespace': 6,
+			 'limit': 20,
+			 'offset': source.gsroffset,
+			 'prop': 'info|pageprops|imageinfo',
+			 'iiprop': 'dimensions|mediatype|url',
+			 'iiurlheight': this.size,
+			 'titles': ( titles[1] || [] ).join( '|' )
+			 }, {
+			 'url': url,
+			 // This request won't be cached since the JSON-P callback is unique. However make sure
+			 // to allow jQuery to cache otherwise so it won't e.g. add "&_=(random)" which will
+			 // trigger a MediaWiki API error for invalid parameter "_".
+			 'cache': true,
+			 // TODO: Only use JSON-P for cross-domain.
+			 // jQuery has this logic built-in (if url is not same-origin ..)
+			 // but isn't working for some reason.
+			 'dataType': 'jsonp'
+			 } )
+			 .done( ve.bind( this.onMediaQueryDone, this, source ) )
+			 .always( ve.bind( this.onMediaQueryAlways, this, source ) );
+
+			/*source.request = ve.init.mw.Target.static.apiRequest( {
 				'action': 'query',
 				'generator': 'search',
 				//'gsrwhat': 'text',
@@ -132,7 +182,8 @@ ve.ui.MWFileSearchWidget.prototype.queryMediaSources = function () {
 				'gsroffset': source.gsroffset,
 				'prop': 'imageinfo',
 				'iiprop': 'dimensions|mediatype|url',
-				'iiurlheight': this.size
+				'iiurlheight': this.size,
+				'titles': ( titles[1] || [] ).join( '|' )
 			}, {
 				'url': url,
 				// This request won't be cached since the JSON-P callback is unique. However make sure
@@ -145,7 +196,8 @@ ve.ui.MWFileSearchWidget.prototype.queryMediaSources = function () {
 				'dataType': 'jsonp'
 			} )
 				.done( ve.bind( this.onMediaQueryDone, this, source ) )
-				.always( ve.bind( this.onMediaQueryAlways, this, source ) );
+				.always( ve.bind( this.onMediaQueryAlways, this, source ) );*/
+
 			source.value = value;
 		}
 	}
