@@ -97,8 +97,9 @@ ve.ui.MWChartInsertDialog.prototype.onSearchSelect = function ( item ) {
 				var itemArr = [];
 				$(csvData.meta.fields).each(function(i2,v2){
 					var arValue = v[v2];
-					if( /^\+?(0|[1-9]\d*)$/.test(arValue) ) {
-						arValue = parseInt(arValue);
+					//if( /^\+?(0|[1-9]\d*)$/.test(arValue) ) {
+					if( Number(arValue) == arValue ) {
+							arValue = parseFloat(arValue);
 					}
 					itemArr.push(arValue);
 				});
