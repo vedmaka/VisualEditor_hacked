@@ -173,9 +173,9 @@ ve.ui.MWChartInsertDialog.prototype.drawChart = function(dataArr, options) {
 
 	if( options == undefined ) {
 		options = {
-			title: 'Sample graph',
-			hAxis: {title: 'x', titleTextStyle: {color: 'red'}},
-			yAxis: {title: 'y', titleTextStyle: {color: 'blue'}}
+			title: 'Sample graph'
+			//hAxis: {title: 'x', titleTextStyle: {color: 'red'}},
+			//yAxis: {title: 'y', titleTextStyle: {color: 'blue'}}
 		};
 	}
 
@@ -186,6 +186,9 @@ ve.ui.MWChartInsertDialog.prototype.drawChart = function(dataArr, options) {
 			break;
 		case "pie":
 			chart = new google.visualization.PieChart( this.chartDiv.get(0) );
+			break;
+		default:
+			chart = new google.visualization.ColumnChart( this.chartDiv.get(0) );
 			break;
 	}
 
