@@ -84,6 +84,14 @@ class VisualEditorHooks {
 				$veParams = $skin->editUrlOptions();
 				unset( $veParams['action'] ); // Remove action=edit
 				$veParams['veaction'] = 'edit'; // Set veaction=edit
+
+				//modify params if form exists for title
+				$form_names = SFFormLinker::getDefaultFormsForPage( $title );
+				if ( count( $form_names ) ) {
+					$veParams['sfEnabled'] = 'true';
+					$veParams['sfForm'] = $form_names[0];
+				}
+
 				$veTabMessage = $wgVisualEditorTabMessages[$existing ? 'edit' : 'create'];
 				$veTabText = $veTabMessage === null ? $data['text'] :
 					wfMessage( $veTabMessage )->setContext( $skin->getContext() )->text();

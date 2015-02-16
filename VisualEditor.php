@@ -465,6 +465,8 @@ $wgResourceModules += array(
 			'lib/ve/modules/ve/ui/inspectors/ve.ui.LinkInspector.js',
 
 			'lib/ve/modules/ve/ui/inspectors/ve.ui.SpecialCharacterInspector.js',
+			//Semantic Form
+			'lib/ve/modules/ve/init/ve.init.SemanticForm.js',
 		),
 		'debugScripts' => array(
 			'lib/ve/modules/ve/init/ve.init.DebugBar.js',

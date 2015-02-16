@@ -23,6 +23,15 @@
 		init, support, getTargetDeferred, enable, userPrefEnabled,
 		plugins = [];
 
+	var sfEnabled, sfTarget;
+
+	function getParameterByName(name, string) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(string);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+
 	/**
 	 * Use deferreds to avoid loading and instantiating Target multiple times.
 	 * @returns {jQuery.Promise}
@@ -33,7 +42,7 @@
 			getTargetDeferred = $.Deferred();
 			loadTargetDeferred = $.Deferred()
 				.done( function () {
-					var debugBar, target = new ve.init.mw.ViewPageTarget();
+					var debugBar, semanticForm, target = new ve.init.mw.ViewPageTarget();
 					ve.init.mw.targets.push( target );
 
 					if ( ve.debug ) {
@@ -45,6 +54,32 @@
 								debugBar.$element.hide();
 							} );
 						} );
+					}
+
+					//Semantic Forms Integration
+					var sfEnabled = getParameterByName('sfEnabled', location.search);
+					var sfForm = getParameterByName('sfForm', location.search);
+
+					if( !sfEnabled || sfForm ) {
+						sfEnabled = getParameterByName('sfEnabled', $('#ca-ve-edit > a').attr('href') );
+						sfForm = getParameterByName('sfForm', $('#ca-ve-edit > a').attr('href') );
+					}
+
+					if( sfEnabled == 'true' ) {
+
+						var sfTarget = mw.config.get('wgTitle');
+
+						semanticForm = new ve.init.SemanticForm();
+						semanticForm.setForm( sfForm );
+						semanticForm.setTarget( sfTarget );
+						target.on( 'surfaceReady', function () {
+							$( '#content' ).append( semanticForm.$element.show() );
+							semanticForm.attachToSurface( target.surface, target );
+							target.surface.on( 'destroy', function () {
+								semanticForm.$element.hide();
+							} );
+						} );
+
 					}
 
 					// Tee tracked events to MediaWiki firehose, if available (1.23+).
