@@ -60,7 +60,7 @@
 					var sfEnabled = getParameterByName('sfEnabled', location.search);
 					var sfForm = getParameterByName('sfForm', location.search);
 
-					if( !sfEnabled || sfForm ) {
+					if( !sfEnabled || !sfForm ) {
 						sfEnabled = getParameterByName('sfEnabled', $('#ca-ve-edit > a').attr('href') );
 						sfForm = getParameterByName('sfForm', $('#ca-ve-edit > a').attr('href') );
 					}
