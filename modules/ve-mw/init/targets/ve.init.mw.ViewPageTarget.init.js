@@ -73,11 +73,13 @@
 						semanticForm.setForm( sfForm );
 						semanticForm.setTarget( sfTarget );
 						target.on( 'surfaceReady', function () {
+
 							$( '#content' ).append( semanticForm.$element.show() );
 							semanticForm.attachToSurface( target.surface, target );
 							target.surface.on( 'destroy', function () {
-								semanticForm.$element.hide();
+								semanticForm.onDestroy();
 							} );
+
 						} );
 
 					}
