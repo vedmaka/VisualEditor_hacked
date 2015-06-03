@@ -203,15 +203,26 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 	// Parent method
 	ve.ui.Dialog.prototype.initialize.call( this );
 
+    var self = this;
+
 	this.defaultThumbSize = mw.config.get( 'wgVisualEditorConfig' )
 		.defaultUserOptions.defaultthumbsize;
 
 	//Texts
 	this.helpText = new OO.ui.Widget({
 		'$': this.$,
-		'$content': 'Please start typing to search and select CSV file to be drawn:',
+		'$content': 'Please start typing to search and select CSV file to be drawn or ',
 		'classes': ['helpText-widget']
 	});
+
+	this.uploadLink =new OO.ui.ButtonWidget({
+		'$': this.$,
+		'label': 'Upload csv',
+        'classes': ['chart-upload-link']
+	});
+    this.uploadInput = $('<input type="file" id="chart-upload" style="display: none;" />');
+
+    this.uploadLink.$element.append( this.uploadInput );
 
 	//Buttons
 	this.applyButton = new OO.ui.ButtonWidget( {
@@ -301,6 +312,9 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 	this.applyButton.connect( this, { 'click': [ 'close', { 'action': 'insert' } ] } );
 	this.applyButton.setDisabled(true);
 	this.chartType.connect( this, {'select': 'onChartTypeSelect'} );
+    this.uploadLink.connect( this, {'click': 'onUploadLinkClick'} );
+    this.uploadInput.unbind();
+    this.uploadInput.bind( 'change', function(){ self.onUploadChange(self) } );
 
 	//Set spinner
 	this.$spinner = this.$( '<div>' ).addClass( 've-specialchar-spinner' );
@@ -318,12 +332,55 @@ ve.ui.MWChartInsertDialog.prototype.initialize = function () {
 	this.optionsFieldset.addItems( [ this.chartHeightField ] );
 	this.optionsFieldset.addItems( [ this.chartTypeField ] );
 
+    this.helpText.$element.append( this.uploadLink.$element );
 	this.searchPanel.$element.append( this.helpText.$element );
 	this.searchPanel.$element.append( this.search.$element );
 
 	this.$body.append( this.panels.$element );
 	this.$foot.append( this.applyButton.$element );
 
+};
+
+ve.ui.MWChartInsertDialog.prototype.onUploadChange = function( ve ) {
+
+    var inputElem = this.uploadInput.get(0);
+
+    if( inputElem.files.length ) {
+
+        //ve.uploadLink.$element.hide();
+
+        var fd = new FormData();
+
+        fd.append('file', inputElem.files[0]);
+        fd.append('token', mw.user.tokens.get('editToken'));
+
+        var self = this;
+        $.ajax({
+            url: '/api.php?action=upload&format=json&ignorewarnings=1&filename=' + inputElem.files[0].name,
+            type: 'POST',
+            data: fd,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false
+        }).done(function (data) {
+            if ( data.upload && data.upload.result && data.upload.result == 'Success') {
+                var uploadedName = data.upload.filename;
+                ve.search.$element.find('input').val(uploadedName);
+                ve.search.onQueryChange();
+                ve.search.queryMediaSources();
+                ve.search.$element.find('input').focus();
+                ve.search.$element.find('input').trigger('keydown');
+            }
+        });
+
+        this.uploadInput.val('');
+
+    }
+
+};
+
+ve.ui.MWChartInsertDialog.prototype.onUploadLinkClick = function() {
+    this.uploadInput.trigger('click');
 };
 
 ve.ui.MWChartInsertDialog.prototype.onChartTypeSelect = function() {

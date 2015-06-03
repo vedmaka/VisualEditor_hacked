@@ -441,7 +441,7 @@ $wgResourceModules += array(
 			'lib/ve/modules/ve/ui/actions/ve.ui.DialogAction.js',
 			'lib/ve/modules/ve/ui/actions/ve.ui.FormatAction.js',
 			'lib/ve/modules/ve/ui/actions/ve.ui.HistoryAction.js',
-			//'lib/ve/modules/ve/ui/actions/ve.ui.IndentationAction.js', #disabled
+			'lib/ve/modules/ve/ui/actions/ve.ui.IndentationAction.js', #disabled
 			'lib/ve/modules/ve/ui/actions/ve.ui.InspectorAction.js',
 			'lib/ve/modules/ve/ui/actions/ve.ui.ListAction.js',
 
@@ -457,7 +457,7 @@ $wgResourceModules += array(
 			'lib/ve/modules/ve/ui/tools/ve.ui.DialogTool.js',
 			'lib/ve/modules/ve/ui/tools/ve.ui.FormatTool.js',
 			'lib/ve/modules/ve/ui/tools/ve.ui.HistoryTool.js',
-			//'lib/ve/modules/ve/ui/tools/ve.ui.IndentationTool.js', #disabled
+			'lib/ve/modules/ve/ui/tools/ve.ui.IndentationTool.js', #disabled
 			'lib/ve/modules/ve/ui/tools/ve.ui.InspectorTool.js',
 			'lib/ve/modules/ve/ui/tools/ve.ui.ListTool.js',
 
