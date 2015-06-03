@@ -62,8 +62,25 @@ ve.ui.MWMediaInsertDialog.prototype.initialize = function () {
 	// Parent method
 	ve.ui.Dialog.prototype.initialize.call( this );
 
+    var self = this;
+
 	this.defaultThumbSize = mw.config.get( 'wgVisualEditorConfig' )
 		.defaultUserOptions.defaultthumbsize;
+
+    //Texts
+    this.helpText = new OO.ui.Widget({
+        '$': this.$,
+        '$content': 'Please start typing to search and select media file to be inserted or ',
+        'classes': ['helpText-widget']
+    });
+
+	this.uploadLink =new OO.ui.ButtonWidget({
+		'$': this.$,
+		'label': 'Upload media',
+		'classes': ['media-upload-link']
+	});
+	this.uploadInput = $('<input type="file" id="media-upload" style="display: none;" />');
+	this.uploadLink.$element.append( this.uploadInput );
 
 	// Widget
 	this.search = new ve.ui.MWMediaSearchWidget( {
@@ -76,10 +93,56 @@ ve.ui.MWMediaInsertDialog.prototype.initialize = function () {
 	// Events
 	this.search.connect( this, { 'select': 'onSearchSelect' } );
 
+    this.uploadLink.connect( this, {'click': 'onUploadLinkClick'} );
+    this.uploadInput.unbind();
+    this.uploadInput.bind( 'change', function(){ self.onUploadChange(self) } );
+
 	this.$spinner = this.$( '<div>' ).addClass( 've-specialchar-spinner' );
 	this.$body.append( this.$spinner );
+    this.helpText.$element.append( this.uploadLink.$element );
+    this.$body.append( this.helpText.$element );
 	this.$body.append( this.search.$element );
 
+};
+
+ve.ui.MWMediaInsertDialog.prototype.onUploadLinkClick = function()
+{
+    this.uploadInput.trigger('click');
+};
+
+ve.ui.MWMediaInsertDialog.prototype.onUploadChange = function( ve )
+{
+    var inputElem = this.uploadInput.get(0);
+
+    if( inputElem.files.length ) {
+
+        var fd = new FormData();
+
+        fd.append('file', inputElem.files[0]);
+        fd.append('token', mw.user.tokens.get('editToken'));
+
+        var self = this;
+        $.ajax({
+            url: '/api.php?action=upload&format=json&ignorewarnings=1&filename=' + inputElem.files[0].name,
+            type: 'POST',
+            data: fd,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false
+        }).done(function (data) {
+            if ( data.upload && data.upload.result && data.upload.result == 'Success') {
+                var uploadedName = data.upload.filename;
+                ve.search.$element.find('input').val(uploadedName);
+                ve.search.onQueryChange();
+                ve.search.queryMediaSources();
+                ve.search.$element.find('input').focus();
+                ve.search.$element.find('input').trigger('keydown');
+            }
+        });
+
+        this.uploadInput.val('');
+
+    }
 };
 
 /**
