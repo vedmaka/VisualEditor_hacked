@@ -29,6 +29,8 @@ ve.init.mw.ViewPageTarget = function VeInitMwViewPageTarget() {
 		currentUri.query.oldid
 	);
 
+	this.saveNoticeWindow = $( '<div class="ve-custom-save-notice">Please save your work periodically to prevent accidental loss of entered information.</div>' );
+
 	// Properties
 	this.$spinner = $( '<div class="ve-init-mw-viewPageTarget-loading"></div>' );
 	this.toolbarCancelButton = null;
@@ -216,6 +218,9 @@ ve.init.mw.ViewPageTarget.prototype.setUpToolbar = function () {
 	this.toolbar.enableFloatable();
 	this.toolbar.$element
 		.addClass( 've-init-mw-viewPageTarget-toolbar' );
+
+	this.toolbar.$element.append( this.saveNoticeWindow );
+
 	// Move the toolbar to before #firstHeading if it exists
 	if ( $firstHeading.length ) {
 		this.toolbar.$element.insertBefore( $firstHeading );
